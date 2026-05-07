@@ -1,0 +1,4 @@
+packages:
+  - "systeminfo-api"
+#  - "apps/*"
+#  - "packages/*"
