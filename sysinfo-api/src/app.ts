@@ -12,6 +12,6 @@ app.get('/', (c) => {
 
 // Add routes...
 
-app.route("/sysinfo", sysinfo);
+app.route('/sysinfo', sysinfo);
 
 export default app
