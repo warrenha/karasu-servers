@@ -1,0 +1,8 @@
+packages:
+  - "sysinfo-api"
+allowBuilds:
+  esbuild: true
+  macos-temperature-sensor: true
+
+#  - "apps/*"
+#  - "packages/*"
