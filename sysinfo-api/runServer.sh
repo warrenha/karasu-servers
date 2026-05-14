@@ -1,4 +1,4 @@
 #!/bin/bash
 
 # pnpm start
-node dist/server.mjs
+nohup node dist/server.mjs &

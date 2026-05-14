@@ -1,6 +1,6 @@
 ```
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 ```
@@ -9,6 +9,10 @@ open http://localhost:3000
 
 ## Production Server
 ```
+cd sysinfo-api
+pnpm run build
+ls -l dist
+
 ./uploadDist.sh
 
 ssh warren@ontan.local
