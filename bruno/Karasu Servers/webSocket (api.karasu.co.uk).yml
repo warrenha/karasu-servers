@@ -1,10 +1,10 @@
 info:
-  name: webSocket
+  name: webSocket (api.karasu.co.uk)
   type: websocket
-  seq: 9
+  seq: 12
 
 websocket:
-  url: ws://localhost:3000/ws
+  url: ws://api.karasu.co.uk:3000/ws
   message:
     type: json
     data: |

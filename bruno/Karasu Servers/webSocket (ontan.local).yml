@@ -1,7 +1,7 @@
 info:
   name: webSocket (ontan.local)
   type: websocket
-  seq: 8
+  seq: 10
 
 websocket:
   url: ws://ontan.local:3000/ws
