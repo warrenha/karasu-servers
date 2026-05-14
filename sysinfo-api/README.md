@@ -21,5 +21,12 @@ cd /opt/karasu/karasu-servers/sysinfo-api
 git pull
 
 ./installServer.sh
+
 ./runServer.sh
+
+Check if an already running node server, causing an error:
+$ ps aux | grep node
+warren    590345  node dist/server.mjs
+
+$ kill 590345
 ```
