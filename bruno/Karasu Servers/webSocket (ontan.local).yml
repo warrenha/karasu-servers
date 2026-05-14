@@ -1,10 +1,10 @@
 info:
-  name: webSocket
+  name: webSocket (ontan.local)
   type: websocket
-  seq: 7
+  seq: 8
 
 websocket:
-  url: ws://localhost:3000/ws
+  url: ws://ontan.local:3000/ws
   message:
     type: json
     data: |

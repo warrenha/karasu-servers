@@ -1,10 +1,10 @@
 info:
-  name: webSocket
+  name: webSocket (ontan IP)
   type: websocket
-  seq: 7
+  seq: 9
 
 websocket:
-  url: ws://localhost:3000/ws
+  url: ws://82.71.20.56:3000/ws
   message:
     type: json
     data: |
