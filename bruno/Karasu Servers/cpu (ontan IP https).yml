@@ -1,11 +1,11 @@
 info:
-  name: cpuTemperature
+  name: cpu (ontan IP https)
   type: http
-  seq: 9
+  seq: 7
 
 http:
   method: GET
-  url: http://localhost:3000/sysinfo/cpuTemperature
+  url: https://82.71.20.56/sysinfo/cpu
   auth: inherit
 
 settings:

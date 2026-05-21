@@ -1,6 +1,6 @@
 import { WebSocketServer, type WebSocket } from 'ws'
 import { Hono } from 'hono'
-import { getCpuTemperature } from './utils/SystemInfo'
+import { getCpuTemperatureForWs, getCurrentLoadForWs } from './utils/SystemInfo'
 
 const Interval = 10000
 const Heartbeat = 30000
@@ -22,16 +22,17 @@ type Payload = {
 
 const clients = new Set<AliveWebSocket>()
 
-const getSystemPayload = async (): Payload => {
-    const cpu = await getCpuTemperature()
+const getSystemPayload = async (): Promise<Payload> => {
+    const cpu = await getCpuTemperatureForWs()
+
+    const load = await getCurrentLoadForWs()
 
     const payload = {
         type: 'system.cpu.temperature',
         payload: {
-            main: cpu.main,
-            cores: cpu.cores,
-            max: cpu.max
-        },
+            cpu,
+            load
+        }
     }
     return payload
 }
@@ -115,8 +116,9 @@ const stopHeartbeat = () => {
 
 // - - - - - WebSocket - - - - - //
 
-wss.on('connection', (ws, req) => {
+wss.on('connection', (_ws: WebSocket, req) => {
     console.log('client connected')
+    const ws = _ws as AliveWebSocket
     ws.isAlive = true
     clients.add(ws)
 

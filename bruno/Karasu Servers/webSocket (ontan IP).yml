@@ -1,7 +1,7 @@
 info:
   name: webSocket (ontan IP)
   type: websocket
-  seq: 11
+  seq: 13
 
 websocket:
   url: ws://82.71.20.56:3000/ws
