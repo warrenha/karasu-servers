@@ -1,11 +1,11 @@
 info:
-  name: cpuTemperature
+  name: currentLoad
   type: http
-  seq: 9
+  seq: 10
 
 http:
   method: GET
-  url: http://localhost:3000/sysinfo/cpuTemperature
+  url: http://localhost:3000/sysinfo/currentLoad
   auth: inherit
 
 settings:

@@ -24,7 +24,48 @@ export const getCpuTemperature = async () => {
     console.debug('cpuTemperature')
 
     return si.cpuTemperature().then(data => {
-        console.debug(data)
+        //console.debug(data)
         return data;
     })
+}
+
+/*
+ * Simpler object than getCpuTemperature, for WebSocket payload.
+ */
+export const getCpuTemperatureForWs = async () => {
+    return getCpuTemperature().then(d => ({
+        main: d.main,
+        cores: d.cores,
+        max: d.max
+    }))
+}
+
+/*
+ * Gets current system load.
+ *
+ * https://systeminformation.io/processes.html
+ */
+export const getCurrentLoad = async () => {
+    console.debug('currentLoad')
+
+    return si.currentLoad().then(data => {
+        //console.debug(data)
+        return data;
+    })
+}
+
+/*
+ * Simpler object than getCurrentLoad, for WebSocket payload.
+ */
+export const getCurrentLoadForWs = async () => {
+    return getCurrentLoad().then(d => ({
+        load: d.currentLoad,
+        loadUser: d.currentLoadUser,
+        loadSystem: d.currentLoadSystem,
+        cpus: (d.cpus || []).map(c => ({
+            load: c.load,
+            loadUser: c.loadUser,
+            loadSystem: c.loadSystem
+        }))
+    }))
 }

@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
-import { getCpu, getCpuTemperature } from '../utils/SystemInfo'
+import { getCpu, getCpuTemperature, getCurrentLoad }
+    from '../utils/SystemInfo'
 
 /*
  * Endpoints for the '/sysinfo' path.
@@ -15,6 +16,11 @@ sysinfo.get('/cpu', async (c) => {
 
 sysinfo.get('/cpuTemperature', async (c) => {
     const cpu = await getCpuTemperature()
+    return c.json(cpu)
+})
+
+sysinfo.get('/currentLoad', async (c) => {
+    const cpu = await getCurrentLoad()
     return c.json(cpu)
 })
 

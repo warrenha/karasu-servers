@@ -1,7 +1,7 @@
 info:
   name: webSocket (api.karasu.co.uk)
   type: websocket
-  seq: 12
+  seq: 14
 
 websocket:
   url: ws://api.karasu.co.uk:3000/ws
