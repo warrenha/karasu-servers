@@ -1,0 +1,63 @@
+# PostgreSQL Database
+
+## Purpose
+
+This skill helps query the project's PostgreSQL/PostGIS database.
+
+The database contains the administrative boundary and roads in Bristol, UK.
+
+## Connection
+
+Use:
+
+```bash
+psql "$DATABASE_URL_GIS_RO"
+```
+
+The database user is read-only.
+
+Never issue:
+
+- INSERT
+- UPDATE
+- DELETE
+- DROP
+- ALTER
+- CREATE
+
+## Schema
+
+Only use the schema 'osm'.
+
+Always inspect the schema first if uncertain.
+
+Useful commands:
+
+\dt osm.*
+\d osm.planet_osm_roads
+
+## Guidelines
+
+When generating SQL:
+
+- Qualify schemas
+- Prefer explicit JOINs.
+- Always LIMIT results unless requested otherwise.
+- Use EXPLAIN before expensive queries if appropriate.
+- Never attempt INSERT, UPDATE, DELETE, CREATE, ALTER, or DROP.
+
+- Prefer LIMIT 100 unless the user requests all rows.
+- Use PostGIS functions where appropriate.
+
+
+## Examples
+
+Show the Bristol Boundary...
+
+```sql
+SELECT osm_id, name, boundary, operator, ST_AsText(way), way
+  FROM osm.planet_osm_roads
+ WHERE osm_id = -57539
+ ORDER BY osm_id
+ LIMIT 100
+```
