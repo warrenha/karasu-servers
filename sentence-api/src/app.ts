@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-//import sysinfo from './routes/sysinfo'
+import { helloRouter } from './routes/hello-router'
 
 /*
  * Endpoints for the HTTP server.
@@ -30,6 +30,6 @@ app.get('/', (c) => {
 
 // Add routes...
 
-//app.route('/sysinfo', sysinfo);
+app.route('/hello', helloRouter);
 
 export default app
