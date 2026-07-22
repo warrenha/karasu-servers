@@ -4,6 +4,7 @@
     "type": "module",
     "scripts": {
         "dev": "tsx watch src/server.ts",
+        "test": "tsx --test 'src/**/*.test.ts'",
         "typecheck": "tsc --noEmit",
         "build": "tsdown src/server.ts --format esm --out-dir dist",
         "start": "node dist/server.mjs"

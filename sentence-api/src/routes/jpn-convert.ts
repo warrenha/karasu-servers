@@ -1,130 +1,91 @@
+import { createRequire } from 'node:module'
+import { dirname, join } from 'node:path'
 import kuromoji from 'kuromoji'
 import { toHiragana } from 'wanakana'
-import type { IpadicFeatures } from "kuromoji"
+import type { IpadicFeatures, Tokenizer } from 'kuromoji'
 
-// Path to the dictionary files inside your node_modules
-const dicPath = "node_modules/kuromoji/dict"
+// Use Node's normal package resolution for the dictionary path.
+const require = createRequire(import.meta.url)
+const dicPath = join(dirname(require.resolve('kuromoji/package.json')), 'dict')
 
-type SpeechPart = {
-    text: string,
-    partOfSpeech: string,
-    katakana?: string | null,  // If different to 'text'
-    hiragana?: string | null,  // If different to 'text'
-    baseForm?: string  // If different to 'text'
+export type SpeechPart = {
+    text: string
+    pos: string  // Part of speech
+    hiragana?: string | null
+    baseForm?: string
 }
 
-const POS_TRANSLATION_MAP: Record<string, string> = {
-    "名詞": "Noun",
-    "動詞": "Verb",
-    "助詞": "Particle",
-    "形容詞": "Adjective", // i-adjectives like おいしい
-    "副詞": "Adverb",
-    "助動詞": "Auxiliary Verb", // e.g., masu endings or copula forms
-    "接続詞": "Conjunction",
-    "感動詞": "Interjection",
-    "連体詞": "Pre-noun Adjectival", // Words that only modify nouns, like この
-    "接頭詞": "Prefix",
-    "記号": "Symbol", // Punctuation like 。 or 、
-    "その他": "Other",
-    "フィラー": "Filler" // Speech pauses like "ええと"
+// Translate the POS (part of speech) returned by Kuromoji.
+const PartOfSpeechTranslation: Record<string, string> = {
+    '名詞': 'noun',
+    '動詞': 'verb',
+    '助詞': 'particle',
+    '形容詞': 'adjective',
+    '副詞': 'adverb',
+    '助動詞': 'auxiliary verb',
+    '接続詞': 'conjunction',
+    '感動詞': 'interjection',
+    '連体詞': 'pre-noun adjectival',
+    '接頭詞': 'prefix',
+    '記号': 'symbol',
+    'その他': 'other',
+    'フィラー': 'filler'
 }
 
-//const sentence = "勉強するのは疲れる"
-
-const tokenizeSentence = (text: string): Promise<IpadicFeatures[]> => {
-    return new Promise((resolve, reject) => {
-        kuromoji.builder({ dicPath }).build((err, tokenizer) => {
-            if (err) return reject(err)
-            
-            const tokens = tokenizer.tokenize(text)
-            resolve(tokens)
-        })
+// Wrap Kuromoji's callback-based build method in a promise for top-level await.
+const tokenizer = await new Promise<Tokenizer<IpadicFeatures>>((resolve, reject) => {
+    console.info('Initializing Kuromoji tokenizer...')
+    kuromoji.builder({ dicPath }).build((error, createdTokenizer) => {
+        if (error) {
+            console.error('Unable to initialize Kuromoji tokenizer', error)
+            reject(error)
+            return
+        }
+        console.info('Kuromoji tokenizer ready')
+        resolve(createdTokenizer)
     })
-}
+})
 
-export const convertToken = (token: IpadicFeatures) => {
-    // The actual text in the sentence, "疲れた"
-    const text = token.surface_form
-    console.log(`Text: ${text}`)
+const textToTokens = (text: string): IpadicFeatures[] => (
+    tokenizer.tokenize(text)
+)
 
-    // The 'dictionary form' of the word, "疲れる"
-    const baseForm = token.basic_form
-
-    // Katakana reading
-    const katakana = token.reading ? token.reading : null
-
-    // Convert to Hiragana safely
+const tokenToPart = (token: IpadicFeatures): SpeechPart => {
+    const text = token.surface_form  // string
+    const pos = PartOfSpeechTranslation[token.pos] ?? 'Unknown'
     const hiragana = token.reading ? toHiragana(token.reading) : null
-        
-    // Part of speech (Noun, Verb, Particle, etc.)
-    const partOfSpeech = token.pos;
+    const baseForm = token.basic_form || null
 
-    // 1. Look up the translation, fallback to "Unknown" if not in the map
-    const englishPos = POS_TRANSLATION_MAP[token.pos] || "Unknown"
+    const part: SpeechPart = { text, pos }
 
-    const obj: SpeechPart = {
-        text,
-        partOfSpeech: englishPos
+    if (!!hiragana && (hiragana !== text)) {
+        part.hiragana = hiragana
     }
-    if (hiragana !== text) {
-        obj.hiragana = hiragana
-        obj.katakana = katakana
+    if (!!baseForm && (baseForm !== text)) {
+        part.baseForm = baseForm
     }
-    if (baseForm !== text) {
-        obj.baseForm = baseForm
-    }
-
-    console.log(`Obj: ${JSON.stringify(obj)}`)
-    return obj
-}
-
-export const convertToFurigana = async (sentence: string) => {
-    try {
-        console.log(`Sentence: ${sentence}`)
-
-        const rawTokens = await tokenizeSentence(sentence)
-
-        // Map the tokens to a clean, useful JSON format
-        const array = rawTokens.map(convertToken)
-
-        console.log(`Array: ${JSON.stringify(array, null, 2)}`)
-        return array
-    }
-    catch (error) {
-        console.error("Error tokenizing text:", error)
-        throw error
-    }
+    return part
 }
 
 /*
- * "勉強するのは疲れる"
+ * Converts a Japanese sentence or text to furigana. Example:
  *
+ * '勉強するのは疲れる' ->
  * [
- *   {
- *     "text": "勉強",
- *     "partOfSpeech": "名詞",
- *     "katakana": "ベンキョウ",
- *     "hiragana": "べんきょう",
- *     "baseForm": "勉強"
- *   },
- *   {
- *     "text": "する",
- *     "partOfSpeech": "動詞"
- *   },
- *   {
- *     "text": "の",
- *     "partOfSpeech": "名詞"
- *   },
- *   {
- *     "text": "は",
- *     "partOfSpeech": "助詞"
- *   },
- *   {
- *     "text": "疲れる",
- *     "partOfSpeech": "動詞",
- *     "katakana": "ツカレル",
- *     "hiragana": "つかれる",
- *     "baseForm": "疲れる"
- *   }
+ *   {"text": "勉強", "pos": "Noun", "hiragana": "べんきょう"},
+ *   {"text": "する", "pos": "Verb"},
+ *   {"text": "の", "pos": "Noun"},
+ *   {"text": "は", "pos": "Particle"},
+ *   {"text": "疲れる", "pos": "Verb", "hiragana": "つかれる"}
  * ]
  */
+export const jpnToFurigana = async (
+    textJpn: string
+): Promise<SpeechPart[]> => {
+    const tokens = textToTokens(textJpn)  // IpadicFeatures[]
+
+    const parts = tokens.map(tokenToPart)  // SpeechPart[]
+
+    console.info(`Converted ${textJpn.length} characters into ${parts.length} parts`)
+    return parts
+}
