@@ -8,6 +8,28 @@ importers:
 
   .: {}
 
+  sentence-api:
+    dependencies:
+      '@hono/node-server':
+        specifier: ^1.19.14
+        version: 1.19.14(hono@4.12.18)
+      hono:
+        specifier: ^4.12.18
+        version: 4.12.18
+    devDependencies:
+      '@types/node':
+        specifier: ^20.19.39
+        version: 20.19.39
+      tsdown:
+        specifier: ^0.22.0
+        version: 0.22.0(tsx@4.21.0)(typescript@6.0.3)
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   sysinfo-api:
     dependencies:
       '@hono/node-server':
