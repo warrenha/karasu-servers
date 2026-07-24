@@ -21,7 +21,7 @@ After starting locally, smoke-test a route with `curl http://localhost:3000/hell
 - Use relative paths only for modules in the same directory or a child directory; do not use parent-relative (`../`) imports.
 - When types, functions, or similar exports from a directory are used outside that directory tree, expose them through an `index.ts` barrel so consumers can use shorter directory imports.
 - When an import contains only types, use `import type { ... }` rather than inline `type` modifiers inside a regular import.
-- Keep imports on one line when the complete statement is at most 100 characters; wrap longer imports across multiple lines.
+- Keep imports and exports on one line when the complete statement is at most 100 characters. When wrapping longer statements, use as few lines as practical by grouping names neatly without exceeding the limit.
 - Name route modules in kebab case (`hello-router.ts`), exported routers in camel case (`helloRouter`), and types in PascalCase (`SpeechPart`).
 - When assigning a non-trivial computed value to an object field, declare it as a named `const` immediately before constructing the object—for example, `const partOfSpeech = POS_TRANSLATION_MAP[token.pos] ?? 'Unknown'` before `{ text, partOfSpeech }`.
 - Add short comments at meaningful code boundaries to explain intent or lifecycle decisions that are not obvious from the code, such as why a module-level promise creates one reusable tokenizer.

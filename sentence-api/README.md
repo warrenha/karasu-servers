@@ -21,8 +21,9 @@ The endpoint accepts a non-empty `sentence` of up to 1,000 characters and return
 
 ## Practice API
 
-Set `DATABASE_URL_JPN_RO` to the `jpnrouser` PostgreSQL connection string. The
-practice endpoints use this read-only connection. List collections with:
+Set `DATABASE_URL_JPN_RO` to the `jpnrouser` PostgreSQL connection string for
+read endpoints and `DATABASE_URL_JPN` to the `jpnuser` connection string for
+write endpoints. List collections with:
 
 ```bash
 curl http://localhost:3000/jpn/practice/collections
@@ -32,6 +33,14 @@ List the sentences in a collection with:
 
 ```bash
 curl http://localhost:3000/jpn/practice/collections/1/sentences
+```
+
+Add a sentence to a collection with:
+
+```bash
+curl -X POST http://localhost:3000/jpn/practice/collections/1/sentence \
+  -H 'content-type: application/json' \
+  -d '{"textEng":"It is exhausting to study.","textJpn":"勉強するのは疲れる。"}'
 ```
 
 ## Database

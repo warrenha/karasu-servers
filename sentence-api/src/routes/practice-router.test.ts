@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import type { PracticeCollection, PracticeSentence, PracticeService } from '@/services/practice'
+import type {
+    BasicPracticeSentence, PracticeCollection, PracticeSentence, PracticeService
+} from '@/services/practice'
 import { createPracticeRouter } from './practice-router'
 
 const collections: PracticeCollection[] = [
@@ -25,6 +27,8 @@ const sentences: PracticeSentence[] = [{
     updatedAt: new Date('2026-01-01T00:00:00.000Z')
 }]
 
+let addedSentence: BasicPracticeSentence | undefined
+
 const service: PracticeService = {
     async listCollections() {
         return collections
@@ -34,6 +38,10 @@ const service: PracticeService = {
     },
     async listSentences(collectionId) {
         return collectionId === '1' ? sentences : []
+    },
+    async addSentence(_collectionId, sentence) {
+        addedSentence = sentence
+        return sentences[0]
     }
 }
 
@@ -78,5 +86,62 @@ test('returns not found for an unknown collection', async () => {
     assert.equal(response.status, 404)
     assert.deepEqual(await response.json(), {
         error: 'Practice collection not found.'
+    })
+})
+
+test('adds a sentence to a collection', async () => {
+    const response = await router.request('http://localhost/collections/1/sentence', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+            textEng: ' It is exhausting to study. ',
+            textJpn: ' 勉強するのは疲れる。 ',
+            sourceName: 'Bunpro',
+            jlptLevel: 'N5'
+        })
+    })
+
+    assert.equal(response.status, 201)
+    assert.deepEqual(addedSentence, {
+        textEng: 'It is exhausting to study.',
+        textJpn: '勉強するのは疲れる。',
+        alternativesEng: [],
+        alternativesJpn: [],
+        notes: null,
+        sourceName: 'Bunpro',
+        sourceUrl: null,
+        sourceItem: null,
+        jlptLevel: 'N5'
+    })
+    assert.deepEqual(await response.json(), {
+        ...sentences[0],
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z'
+    })
+})
+
+test('rejects an invalid sentence', async () => {
+    const response = await router.request('http://localhost/collections/1/sentence', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ textEng: 'Missing Japanese text' })
+    })
+
+    assert.equal(response.status, 400)
+    assert.deepEqual(await response.json(), {
+        error: 'Sentence field is invalid: textJpn'
+    })
+})
+
+test('rejects malformed JSON when adding a sentence', async () => {
+    const response = await router.request('http://localhost/collections/1/sentence', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: '{'
+    })
+
+    assert.equal(response.status, 400)
+    assert.deepEqual(await response.json(), {
+        error: 'Request body must be valid JSON.'
     })
 })
