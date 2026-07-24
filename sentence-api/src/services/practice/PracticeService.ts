@@ -1,28 +1,11 @@
 import { Pool } from 'pg'
 
-export type PracticeCollection = {
-    id: string
-    name: string
-    notes: string
-}
+import {
+    type PracticeCollection,
+    type PracticeSentence
+} from './PracticeTypes'
 
-export type PracticeSentence = {
-    id: string
-    text_eng: string
-    text_jpn: string
-    alternatives_eng: string[]
-    alternatives_jpn: string[]
-    notes: string
-    source_name: string | null
-    source_url: string | null
-    source_item: string | null
-    jlpt_level: string | null
-    collection_id: string
-    created_at: Date
-    updated_at: Date
-}
-
-export type PracticeRepository = {
+export type PracticeService = {
     listCollections: () => Promise<PracticeCollection[]>
     collectionExists: (collectionId: string) => Promise<boolean>
     listSentences: (collectionId: string) => Promise<PracticeSentence[]>
@@ -33,7 +16,7 @@ const pool = new Pool({
     connectionString: process.env.DATABASE_URL_JPN_RO
 })
 
-export const practiceRepository: PracticeRepository = {
+export const practiceService: PracticeService = {
     async listCollections() {
         const result = await pool.query<PracticeCollection>(`
             SELECT id, name, notes

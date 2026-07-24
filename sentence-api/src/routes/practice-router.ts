@@ -1,20 +1,17 @@
 import { Hono } from 'hono'
 
-import {
-    practiceRepository,
-    type PracticeRepository
-} from './practice-data'
+import { practiceService, type PracticeService } from '@/services/practice'
 
 const COLLECTION_ID_PATTERN = /^[1-9]\d*$/
 
 export const createPracticeRouter = (
-    repository: PracticeRepository = practiceRepository
+    service: PracticeService = practiceService
 ) => {
     const router = new Hono()
 
     router.get('/collections', async (c) => {
         try {
-            const collections = await repository.listCollections()
+            const collections = await service.listCollections()
             return c.json(collections)
         } catch (err) {
             console.error('Unable to list practice collections', err)
@@ -29,12 +26,12 @@ export const createPracticeRouter = (
         }
 
         try {
-            const collectionExists = await repository.collectionExists(collectionId)
+            const collectionExists = await service.collectionExists(collectionId)
             if (!collectionExists) {
                 return c.json({ error: 'Practice collection not found.' }, 404)
             }
 
-            const sentences = await repository.listSentences(collectionId)
+            const sentences = await service.listSentences(collectionId)
             return c.json(sentences)
         } catch (err) {
             console.error('Unable to list practice sentences', err)

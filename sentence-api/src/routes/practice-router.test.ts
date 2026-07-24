@@ -3,9 +3,9 @@ import test from 'node:test'
 
 import {
     type PracticeCollection,
-    type PracticeRepository,
+    type PracticeService,
     type PracticeSentence
-} from './practice-data'
+} from '@/services/practice'
 import { createPracticeRouter } from './practice-router'
 
 const collections: PracticeCollection[] = [
@@ -29,7 +29,7 @@ const sentences: PracticeSentence[] = [{
     updated_at: new Date('2026-01-01T00:00:00.000Z')
 }]
 
-const repository: PracticeRepository = {
+const service: PracticeService = {
     async listCollections() {
         return collections
     },
@@ -41,7 +41,7 @@ const repository: PracticeRepository = {
     }
 }
 
-const router = createPracticeRouter(repository)
+const router = createPracticeRouter(service)
 
 test('returns the practice collections', async () => {
     const response = await router.request('http://localhost/collections')

@@ -15,7 +15,15 @@ After starting locally, smoke-test a route with `curl http://localhost:3000/hell
 
 ## Coding Style & Naming Conventions
 
-Write strict, ESM TypeScript. Follow the surrounding code: four-space indentation, single-quoted imports and ordinary strings, and concise arrow-function handlers. Name route modules in kebab case (`hello-router.ts`), exported routers in camel case (`helloRouter`), and types in PascalCase (`SpeechPart`). When assigning a non-trivial computed value to an object field, declare it as a named `const` immediately before constructing the object—for example, `const partOfSpeech = POS_TRANSLATION_MAP[token.pos] ?? 'Unknown'` before `{ text, partOfSpeech }`. Add short comments at meaningful code boundaries to explain intent or lifecycle decisions that are not obvious from the code, such as why a module-level promise creates one reusable tokenizer. Keep HTTP wiring in router files and extract parsing or conversion work into focused helper modules. Run `pnpm typecheck` before submitting changes.
+- Write strict, ESM TypeScript.
+- Follow the surrounding code: four-space indentation, single-quoted imports and ordinary strings, and concise arrow-function handlers.
+- Use the `@/*` TypeScript path alias for imports outside the current directory tree, for example `@/services/practice`.
+- Use relative paths only for modules in the same directory or a child directory; do not use parent-relative (`../`) imports.
+- Name route modules in kebab case (`hello-router.ts`), exported routers in camel case (`helloRouter`), and types in PascalCase (`SpeechPart`).
+- When assigning a non-trivial computed value to an object field, declare it as a named `const` immediately before constructing the object—for example, `const partOfSpeech = POS_TRANSLATION_MAP[token.pos] ?? 'Unknown'` before `{ text, partOfSpeech }`.
+- Add short comments at meaningful code boundaries to explain intent or lifecycle decisions that are not obvious from the code, such as why a module-level promise creates one reusable tokenizer.
+- Keep HTTP wiring in router files and extract parsing or conversion work into focused helper modules.
+- Run `pnpm typecheck` before submitting changes.
 
 ## Testing Guidelines
 
