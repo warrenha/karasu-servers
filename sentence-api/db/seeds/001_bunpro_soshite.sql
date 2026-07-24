@@ -1,6 +1,17 @@
 BEGIN;
 
 -- Bunpro's second example sentence for the vocabulary item そして.
+UPDATE practice.sentences
+SET collection_id = (
+    SELECT id
+    FROM practice.collections
+    WHERE name = 'Default'
+    ORDER BY id
+    LIMIT 1
+)
+WHERE source_url = 'https://bunpro.jp/vocabs/%E3%81%9D%E3%81%97%E3%81%A6'
+  AND text_jpn = '暗くなった。そして雨が降り始めた。';
+
 WITH inserted_sentence AS (
     INSERT INTO practice.sentences (
         text_eng,
@@ -8,7 +19,8 @@ WITH inserted_sentence AS (
         source_name,
         source_url,
         source_item,
-        jlpt_level
+        jlpt_level,
+        collection_id
     )
     SELECT
         'It got dark. Then it started to rain.',
@@ -16,7 +28,14 @@ WITH inserted_sentence AS (
         'Bunpro',
         'https://bunpro.jp/vocabs/%E3%81%9D%E3%81%97%E3%81%A6',
         'そして',
-        'N5'
+        'N5',
+        (
+            SELECT id
+            FROM practice.collections
+            WHERE name = 'Default'
+            ORDER BY id
+            LIMIT 1
+        )
     WHERE NOT EXISTS (
         SELECT 1
         FROM practice.sentences

@@ -3,6 +3,7 @@ import { cors } from 'hono/cors'
 
 import { helloRouter } from './routes/hello-router'
 import { jpnRouter } from './routes/jpn-router'
+import { practiceRouter } from './routes/practice-router'
 
 /*
  * Endpoints for the HTTP server.
@@ -34,5 +35,6 @@ app.get('/', (c) => {
 
 app.route('/hello', helloRouter);
 app.route('/jpn', jpnRouter);
+app.route('/jpn/practice', practiceRouter);
 
 export default app

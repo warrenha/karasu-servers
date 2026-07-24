@@ -1,6 +1,17 @@
 BEGIN;
 
 -- Bunpro's first example sentence for the vocabulary item 疲れる.
+UPDATE practice.sentences
+SET collection_id = (
+    SELECT id
+    FROM practice.collections
+    WHERE name = 'Default'
+    ORDER BY id
+    LIMIT 1
+)
+WHERE source_url = 'https://bunpro.jp/vocabs/%E7%96%B2%E3%82%8C%E3%82%8B'
+  AND text_jpn = '勉強するのは疲れる。';
+
 WITH inserted_sentence AS (
     INSERT INTO practice.sentences (
         text_eng,
@@ -8,7 +19,8 @@ WITH inserted_sentence AS (
         source_name,
         source_url,
         source_item,
-        jlpt_level
+        jlpt_level,
+        collection_id
     )
     SELECT
         'It is exhausting to study.',
@@ -16,7 +28,14 @@ WITH inserted_sentence AS (
         'Bunpro',
         'https://bunpro.jp/vocabs/%E7%96%B2%E3%82%8C%E3%82%8B',
         '疲れる',
-        'N5'
+        'N5',
+        (
+            SELECT id
+            FROM practice.collections
+            WHERE name = 'Default'
+            ORDER BY id
+            LIMIT 1
+        )
     WHERE NOT EXISTS (
         SELECT 1
         FROM practice.sentences

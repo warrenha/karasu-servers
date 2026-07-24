@@ -19,7 +19,25 @@
 
 The endpoint accepts a non-empty `sentence` of up to 1,000 characters and returns an array of token objects. Run `pnpm test` for endpoint checks and `pnpm typecheck` before changes.
 
+## Practice API
+
+Set `DATABASE_URL_JPN_RO` to the `jpnrouser` PostgreSQL connection string. The
+practice endpoints use this read-only connection. List collections with:
+
+```bash
+curl http://localhost:3000/jpn/practice/collections
+```
+
+List the sentences in a collection with:
+
+```bash
+curl http://localhost:3000/jpn/practice/collections/1/sentences
+```
+
 ## Database
+
+Use `DATABASE_URL_JPN` for the write-capable `jpnuser` connection and
+`DATABASE_URL_JPN_RO` for the read-only `jpnrouser` connection.
 
 The PostgreSQL setup scripts are in `db/`. Create the database while connected as a database administrator, then run the migration against it:
 
@@ -29,8 +47,9 @@ The PostgreSQL setup scripts are in `db/`. Create the database while connected a
   -- or
   createdb -h ontan.local -U postgres jpn
 
-  psql -d jpn -f db/migrations/001_create_practice_sentences.sql
-  psql -d jpn -f db/migrations/002_add_notes_to_words.sql
+  psql "$DATABASE_URL_JPN" -v ON_ERROR_STOP=1 -f db/migrations/001_create_practice_sentences.sql
+  psql "$DATABASE_URL_JPN" -v ON_ERROR_STOP=1 -f db/migrations/002_add_notes_to_words.sql
+  psql "$DATABASE_URL_JPN" -v ON_ERROR_STOP=1 -f db/migrations/003_add_collections.sql
 ```
 
 To create the read-only `jpnrouser` login, run this as a PostgreSQL administrator. The script prompts securely for its password:
@@ -39,21 +58,34 @@ To create the read-only `jpnrouser` login, run this as a PostgreSQL administrato
 psql -h ontan.local -U postgres -d jpn -v ON_ERROR_STOP=1 -f db/create-read-only-user.sql
 ```
 
-Seed Bunpro's second `そして` example sentence with:
+Create the `Default` collection before loading the example sentences:
 
 ```bash
-psql -U jpnuser -d jpn -v ON_ERROR_STOP=1 -f db/seeds/001_bunpro_soshite.sql
+psql "$DATABASE_URL_JPN" -v ON_ERROR_STOP=1 -f db/seeds/000_default_collection.sql
 ```
 
-Seed Bunpro's `疲れる` example sentence with:
+Seed Bunpro's second `そして` example sentence into that collection with:
 
 ```bash
-psql -U jpnuser -d jpn -v ON_ERROR_STOP=1 -f db/seeds/002_bunpro_tsukareru.sql
+psql "$DATABASE_URL_JPN" -v ON_ERROR_STOP=1 -f db/seeds/001_bunpro_soshite.sql
 ```
 
-Practice sentences are stored in `practice.sentences`. English and Japanese alternatives are PostgreSQL `text[]` columns. The table also stores optional source metadata (`source_name`, `source_url`, `source_item`), an optional `jlpt_level`, and a general `notes` field. Reusable highlighted words are in `practice.words`, with their own optional `notes`, and linked to sentences through `practice.sentence_highlights`.
+Seed Bunpro's `疲れる` example sentence into that collection with:
+
+```bash
+psql "$DATABASE_URL_JPN" -v ON_ERROR_STOP=1 -f db/seeds/002_bunpro_tsukareru.sql
+```
+
+Practice sentences are stored in `practice.sentences`. English and Japanese alternatives are PostgreSQL `text[]` columns. The table also stores optional source metadata (`source_name`, `source_url`, `source_item`), an optional `jlpt_level`, and a general `notes` field. Sentences can optionally belong to a named entry in `practice.collections`; deleting a collection leaves its sentences in place and clears their `collection_id`. Reusable highlighted words are in `practice.words`, with their own optional `notes`, and linked to sentences through `practice.sentence_highlights`.
 
 ```sql
+INSERT INTO practice.collections (name, notes)
+VALUES ('Bunpro examples', 'Sentences collected from Bunpro.');
+
+UPDATE practice.sentences
+SET collection_id = 1
+WHERE id = 1;
+
 INSERT INTO practice.words (word_jpn, meaning_eng)
 VALUES ('そして', 'then; and then');
 
