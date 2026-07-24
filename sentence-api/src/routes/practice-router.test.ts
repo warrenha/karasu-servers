@@ -1,11 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import {
-    type PracticeCollection,
-    type PracticeService,
-    type PracticeSentence
-} from '@/services/practice'
+import type { PracticeCollection, PracticeSentence, PracticeService } from '@/services/practice'
 import { createPracticeRouter } from './practice-router'
 
 const collections: PracticeCollection[] = [
@@ -15,18 +11,18 @@ const collections: PracticeCollection[] = [
 
 const sentences: PracticeSentence[] = [{
     id: '7',
-    text_eng: 'It is exhausting to study.',
-    text_jpn: '勉強するのは疲れる。',
-    alternatives_eng: [],
-    alternatives_jpn: [],
+    textEng: 'It is exhausting to study.',
+    textJpn: '勉強するのは疲れる。',
+    alternativesEng: [],
+    alternativesJpn: [],
     notes: '',
-    source_name: 'Bunpro',
-    source_url: 'https://bunpro.jp/vocabs/%E7%96%B2%E3%82%8C%E3%82%8B',
-    source_item: '疲れる',
-    jlpt_level: 'N5',
-    collection_id: '1',
-    created_at: new Date('2026-01-01T00:00:00.000Z'),
-    updated_at: new Date('2026-01-01T00:00:00.000Z')
+    sourceName: 'Bunpro',
+    sourceUrl: 'https://bunpro.jp/vocabs/%E7%96%B2%E3%82%8C%E3%82%8B',
+    sourceItem: '疲れる',
+    jlptLevel: 'N5',
+    collectionId: '1',
+    createdAt: new Date('2026-01-01T00:00:00.000Z'),
+    updatedAt: new Date('2026-01-01T00:00:00.000Z')
 }]
 
 const service: PracticeService = {
@@ -56,8 +52,8 @@ test('returns the sentences in a collection', async () => {
     assert.equal(response.status, 200)
     assert.deepEqual(await response.json(), [{
         ...sentences[0],
-        created_at: '2026-01-01T00:00:00.000Z',
-        updated_at: '2026-01-01T00:00:00.000Z'
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z'
     }])
 })
 

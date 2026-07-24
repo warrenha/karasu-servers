@@ -1,9 +1,6 @@
 import { Pool } from 'pg'
 
-import {
-    type PracticeCollection,
-    type PracticeSentence
-} from './PracticeTypes'
+import type { PracticeCollection, PracticeSentence } from './PracticeTypes'
 
 export type PracticeService = {
     listCollections: () => Promise<PracticeCollection[]>
@@ -39,18 +36,18 @@ export const practiceService: PracticeService = {
         const result = await pool.query<PracticeSentence>(`
             SELECT
                 id,
-                text_eng,
-                text_jpn,
-                alternatives_eng,
-                alternatives_jpn,
+                text_eng AS "textEng",
+                text_jpn AS "textJpn",
+                alternatives_eng AS "alternativesEng",
+                alternatives_jpn AS "alternativesJpn",
                 notes,
-                source_name,
-                source_url,
-                source_item,
-                jlpt_level,
-                collection_id,
-                created_at,
-                updated_at
+                source_name AS "sourceName",
+                source_url AS "sourceUrl",
+                source_item AS "sourceItem",
+                jlpt_level AS "jlptLevel",
+                collection_id AS "collectionId",
+                created_at AS "createdAt",
+                updated_at AS "updatedAt"
             FROM practice.sentences
             WHERE collection_id = $1
             ORDER BY id

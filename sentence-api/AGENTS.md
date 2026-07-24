@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-Application code lives in `src/`. `src/server.ts` starts the Node server, while `src/app.ts` configures the shared Hono app, middleware, and route mounting. Keep route handlers in `src/routes/`; use a `*-router.ts` file for an endpoint group and place supporting domain logic beside it (for example, `jpn-convert.ts`). Build output is generated in `dist/` and must not be edited directly.
+Application code lives in `src/`. `src/server.ts` starts the Node server, while `src/app.ts` configures the shared Hono app, middleware, and route mounting. Keep route handlers in `src/routes/`; use a `*-router.ts` file for an endpoint group and place reusable domain logic in `src/services/`. Build output is generated in `dist/` and must not be edited directly.
 
 ## Build, Test, and Development Commands
 
@@ -19,6 +19,9 @@ After starting locally, smoke-test a route with `curl http://localhost:3000/hell
 - Follow the surrounding code: four-space indentation, single-quoted imports and ordinary strings, and concise arrow-function handlers.
 - Use the `@/*` TypeScript path alias for imports outside the current directory tree, for example `@/services/practice`.
 - Use relative paths only for modules in the same directory or a child directory; do not use parent-relative (`../`) imports.
+- When types, functions, or similar exports from a directory are used outside that directory tree, expose them through an `index.ts` barrel so consumers can use shorter directory imports.
+- When an import contains only types, use `import type { ... }` rather than inline `type` modifiers inside a regular import.
+- Keep imports on one line when the complete statement is at most 100 characters; wrap longer imports across multiple lines.
 - Name route modules in kebab case (`hello-router.ts`), exported routers in camel case (`helloRouter`), and types in PascalCase (`SpeechPart`).
 - When assigning a non-trivial computed value to an object field, declare it as a named `const` immediately before constructing the object—for example, `const partOfSpeech = POS_TRANSLATION_MAP[token.pos] ?? 'Unknown'` before `{ text, partOfSpeech }`.
 - Add short comments at meaningful code boundaries to explain intent or lifecycle decisions that are not obvious from the code, such as why a module-level promise creates one reusable tokenizer.

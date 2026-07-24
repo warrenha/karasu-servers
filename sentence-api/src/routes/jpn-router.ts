@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { jpnToFurigana } from './jpn-convert'
+import { jpnToFurigana } from '@/services/utils'
 
 const MAX_SENTENCE_LENGTH = 1000
 

@@ -1,8 +1,2 @@
-export {
-    practiceService,
-    type PracticeService
-} from './PracticeService'
-export {
-    type PracticeCollection,
-    type PracticeSentence
-} from './PracticeTypes'
+export { practiceService, type PracticeService } from './PracticeService'
+export type { PracticeCollection, PracticeSentence } from './PracticeTypes'

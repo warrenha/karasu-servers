@@ -3,17 +3,11 @@ import { dirname, join } from 'node:path'
 import kuromoji from 'kuromoji'
 import { toHiragana } from 'wanakana'
 import type { IpadicFeatures, Tokenizer } from 'kuromoji'
+import type { SpeechPart } from './JpnTypes'
 
 // Use Node's normal package resolution for the dictionary path.
 const require = createRequire(import.meta.url)
 const dicPath = join(dirname(require.resolve('kuromoji/package.json')), 'dict')
-
-export type SpeechPart = {
-    text: string
-    pos: string  // Part of speech
-    hiragana?: string | null
-    baseForm?: string
-}
 
 // Translate the POS (part of speech) returned by Kuromoji.
 const PartOfSpeechTranslation: Record<string, string> = {
