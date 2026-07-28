@@ -1,6 +1,7 @@
 import type { BasicPracticeSentence, JlptLevel } from '@/services/practice'
 
 const JLPT_LEVELS = new Set<JlptLevel>(['N5', 'N4', 'N3', 'N2', 'N1'])
+const POSITIVE_INTEGER_PATTERN = /^[1-9]\d*$/
 
 const isStringArray = (value: unknown): value is string[] => (
     Array.isArray(value) && value.every((item) => typeof item === 'string')
@@ -32,6 +33,10 @@ const isOptionalSetValue = <Value extends string>(
 
 const invalidField = (field: string): Error => (
     new Error(`Sentence field is invalid: ${field}`)
+)
+
+export const isPositiveInteger = (value: string): boolean => (
+    POSITIVE_INTEGER_PATTERN.test(value)
 )
 
 export const parseSentence = (body: unknown): BasicPracticeSentence => {

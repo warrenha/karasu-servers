@@ -43,6 +43,12 @@ curl -X POST http://localhost:3000/jpn/practice/collections/1/sentence \
   -d '{"textEng":"It is exhausting to study.","textJpn":"勉強するのは疲れる。"}'
 ```
 
+Delete a sentence from a collection with:
+
+```bash
+curl -X DELETE http://localhost:3000/jpn/practice/collections/1/sentence/7
+```
+
 ## Database
 
 Use `DATABASE_URL_JPN` for the write-capable `jpnuser` connection and

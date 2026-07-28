@@ -1,7 +1,15 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { parseSentence } from './practice-validate'
+import { isPositiveInteger, parseSentence } from './practice-validate'
+
+test('identifies positive integer path values', () => {
+    assert.equal(isPositiveInteger('1'), true)
+    assert.equal(isPositiveInteger('42'), true)
+    assert.equal(isPositiveInteger('0'), false)
+    assert.equal(isPositiveInteger('-1'), false)
+    assert.equal(isPositiveInteger('1.5'), false)
+})
 
 test('normalizes a valid practice sentence', () => {
     assert.deepEqual(parseSentence({

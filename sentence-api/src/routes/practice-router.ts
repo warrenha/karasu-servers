@@ -2,9 +2,7 @@ import { Hono } from 'hono'
 
 import { practiceService } from '@/services/practice'
 import type { BasicPracticeSentence, PracticeService } from '@/services/practice'
-import { parseSentence } from './practice-validate'
-
-const COLLECTION_ID_PATTERN = /^[1-9]\d*$/
+import { isPositiveInteger, parseSentence } from './practice-validate'
 
 export const createPracticeRouter = (
     service: PracticeService = practiceService
@@ -23,7 +21,7 @@ export const createPracticeRouter = (
 
     router.get('/collections/:collectionId/sentences', async (c) => {
         const collectionId = c.req.param('collectionId')
-        if (!COLLECTION_ID_PATTERN.test(collectionId)) {
+        if (!isPositiveInteger(collectionId)) {
             return c.json({ error: 'collectionId must be a positive integer.' }, 400)
         }
 
@@ -43,7 +41,7 @@ export const createPracticeRouter = (
 
     router.post('/collections/:collectionId/sentence', async (c) => {
         const collectionId = c.req.param('collectionId')
-        if (!COLLECTION_ID_PATTERN.test(collectionId)) {
+        if (!isPositiveInteger(collectionId)) {
             return c.json({ error: 'collectionId must be a positive integer.' }, 400)
         }
 
@@ -73,6 +71,35 @@ export const createPracticeRouter = (
         } catch (err) {
             console.error('Unable to add practice sentence', err)
             return c.json({ error: 'Unable to add practice sentence.' }, 500)
+        }
+    })
+
+    router.delete('/collections/:collectionId/sentence/:sentenceId', async (c) => {
+        const collectionId = c.req.param('collectionId')
+        const sentenceId = c.req.param('sentenceId')
+        
+        if (!isPositiveInteger(collectionId)) {
+            return c.json({ error: 'collectionId must be a positive integer.' }, 400)
+        }
+        if (!isPositiveInteger(sentenceId)) {
+            return c.json({ error: 'sentenceId must be a positive integer.' }, 400)
+        }
+
+        try {
+            const exists = await service.collectionExists(collectionId)
+            if (!exists) {
+                return c.json({ error: 'Practice collection not found.' }, 404)
+            }
+
+            const deleted = await service.deleteSentence(collectionId, sentenceId)
+            if (!deleted) {
+                return c.json({ error: 'Practice sentence not found.' }, 404)
+            }
+
+            return c.body(null, 204)
+        } catch (err) {
+            console.error('Unable to delete practice sentence', err)
+            return c.json({ error: 'Unable to delete practice sentence.' }, 500)
         }
     })
 

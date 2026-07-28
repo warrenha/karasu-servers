@@ -28,6 +28,7 @@ const sentences: PracticeSentence[] = [{
 }]
 
 let addedSentence: BasicPracticeSentence | undefined
+let deletedSentenceIds: { collectionId: string, sentenceId: string } | undefined
 
 const service: PracticeService = {
     async listCollections() {
@@ -42,6 +43,10 @@ const service: PracticeService = {
     async addSentence(_collectionId, sentence) {
         addedSentence = sentence
         return sentences[0]
+    },
+    async deleteSentence(collectionId, sentenceId) {
+        deletedSentenceIds = { collectionId, sentenceId }
+        return sentenceId === '7'
     }
 }
 
@@ -143,5 +148,40 @@ test('rejects malformed JSON when adding a sentence', async () => {
     assert.equal(response.status, 400)
     assert.deepEqual(await response.json(), {
         error: 'Request body must be valid JSON.'
+    })
+})
+
+test('deletes a sentence from a collection', async () => {
+    const response = await router.request('http://localhost/collections/1/sentence/7', {
+        method: 'DELETE'
+    })
+
+    assert.equal(response.status, 204)
+    assert.equal(await response.text(), '')
+    assert.deepEqual(deletedSentenceIds, {
+        collectionId: '1',
+        sentenceId: '7'
+    })
+})
+
+test('returns not found when deleting an unknown sentence', async () => {
+    const response = await router.request('http://localhost/collections/1/sentence/99', {
+        method: 'DELETE'
+    })
+
+    assert.equal(response.status, 404)
+    assert.deepEqual(await response.json(), {
+        error: 'Practice sentence not found.'
+    })
+})
+
+test('rejects an invalid sentence ID when deleting', async () => {
+    const response = await router.request('http://localhost/collections/1/sentence/invalid', {
+        method: 'DELETE'
+    })
+
+    assert.equal(response.status, 400)
+    assert.deepEqual(await response.json(), {
+        error: 'sentenceId must be a positive integer.'
     })
 })

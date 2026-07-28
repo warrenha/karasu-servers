@@ -12,6 +12,7 @@ export type PracticeService = {
         collectionId: string,
         sentence: BasicPracticeSentence
     ) => Promise<PracticeSentence>
+    deleteSentence: (collectionId: string, sentenceId: string) => Promise<boolean>
 }
 
 // The pools are shared by all requests for the lifetime of the server.
@@ -111,5 +112,15 @@ export const practiceService: PracticeService = {
             throw new Error('PostgreSQL did not return the created sentence.')
         }
         return createdSentence
+    },
+
+    async deleteSentence(collectionId, sentenceId) {
+        const result = await writePool.query(`
+            DELETE FROM practice.sentences
+            WHERE id = $1
+              AND collection_id = $2
+            RETURNING id
+        `, [sentenceId, collectionId])
+        return result.rowCount === 1
     }
 }
